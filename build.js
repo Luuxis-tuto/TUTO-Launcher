@@ -5,6 +5,7 @@ const JavaScriptObfuscator = require('javascript-obfuscator');
 const nodeFetch = require('node-fetch')
 const png2icons = require('png2icons');
 const Jimp = require('jimp');
+const icoToPng = require('ico-to-png')
 
 const { preductname } = require('./package.json');
 
@@ -150,12 +151,27 @@ class Index {
         let Buffer = await nodeFetch(url)
         if (Buffer.status == 200) {
             Buffer = await Buffer.buffer()
-            const image = await Jimp.read(Buffer);
-            Buffer = await image.resize(256, 256).getBufferAsync(Jimp.MIME_PNG)
-            fs.writeFileSync("src/assets/images/icon.icns", png2icons.createICNS(Buffer, png2icons.BILINEAR, 0));
-            fs.writeFileSync("src/assets/images/icon.ico", png2icons.createICO(Buffer, png2icons.HERMITE, 0, false));
-            fs.writeFileSync("src/assets/images/icon.png", Buffer);
-            console.log('new icon set')
+
+            let type = Buffer.slice(0, 4).toString('hex')
+
+            if (type == '89504e47') {
+                const image = await Jimp.read(Buffer);
+                Buffer = await image.resize(256, 256).getBufferAsync(Jimp.MIME_PNG)
+                fs.writeFileSync("src/assets/images/icon.icns", png2icons.createICNS(Buffer, png2icons.BILINEAR, 0));
+                fs.writeFileSync("src/assets/images/icon.ico", png2icons.createICO(Buffer, png2icons.HERMITE, 0, false));
+                fs.writeFileSync("src/assets/images/icon.png", Buffer);
+                console.log('new icon set')
+
+            } else if (type == '00000100') {
+                await icoToPng(Buffer, 128).then(async data => {
+                    fs.writeFileSync("src/assets/images/icon.icns", png2icons.createICNS(data, png2icons.BILINEAR, 0));
+                    fs.writeFileSync("src/assets/images/icon.ico", png2icons.createICO(data, png2icons.HERMITE, 0, false));
+                    fs.writeFileSync("src/assets/images/icon.png", data);
+                    console.log('new icon set')
+                })
+            } else {
+                console.log('invalid file')
+            }
         } else {
             console.log('connection error')
         }
