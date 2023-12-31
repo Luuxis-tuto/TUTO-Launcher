@@ -1,7 +1,7 @@
 {
     "name": "Tuto-Launcher",
     "preductname": "Tuto Launcher",
-    "version": "2.0.0",
+    "version": "1.0.1",
     "description": "Launcher Mincraft pour le serveur Selvania",
     "main": "src/app.js",
     "author": {
@@ -40,5 +40,5 @@
     "repository": {
         "type": "git",
         "url": "git+https://github.com/Luuxis-tuto/tuto-Launcher.git"
-    }
+    } 
 }
